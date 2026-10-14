@@ -60,5 +60,7 @@ export async function geocodeCity(name) {
 // TODO (you): get the current weather and a 3-day daily forecast from the
 // forecast API and return the parsed response.
 export async function getForecast(latitude, longitude) {
-  throw new Error('getForecast is not written yet');
+  //not sure if parsed means I need to assign parts to different vars that get returned i guess we will see.
+  const url = `${config.forecastUrl}/forecast?latitude=${latitude}&longitude=${longitude}&current=temperature_2m,apparent_temperature,relative_humidity_2m,wind_speed_10m,weather_code&daily=weather_code,temperature_2m_max,temperature_2m_min,precipitation_probability_max&timezone=auto&forecast_days=3`;
+  return await fetchJson(url);
 }
