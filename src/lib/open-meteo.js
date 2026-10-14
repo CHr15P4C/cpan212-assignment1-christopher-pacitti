@@ -38,7 +38,23 @@ async function fetchJson(url) {
 // { name, region, country, latitude, longitude, timezone } for the first result.
 // Throw a 404 HttpError when there are no results.
 export async function geocodeCity(name) {
-  throw new Error('geocodeCity is not written yet');
+  //url from assignment doc
+  const url = `${config.geocodingUrl}/search?name=${name}&count=1&language=en&format=json`;
+  const data = await fetchJson(url);
+  //404 when no results
+  if (!data.results || data.results.length === 0) {
+    throw new HttpError(404, `City not found: ${name}`);
+  }
+  //parse first response
+  const result = data.results[0];
+  return {
+    name: result.name,
+    region: result.region,
+    country: result.country,
+    latitude: result.latitude,
+    longitude: result.longitude,
+    timezone: result.timezone
+  };
 }
 
 // TODO (you): get the current weather and a 3-day daily forecast from the
