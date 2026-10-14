@@ -19,19 +19,21 @@ async function fetchJson(url) {
     });
   } catch (err) {
     if (err.name === 'TimeoutError') {
-      throw new HttpError(504, 'Timeout Failure');
+      throw new HttpError(504, 'The geocoding service did not respond within 1 ms');
     }
-    throw new HttpError(502, 'Network Failure');
+    //catch network
+    throw new HttpError(502, 'Could not get a valid response from the forecast service');
   }
-
+  //bad response
   if (!res.ok) {
-    throw new HttpError(502, `Bad Status: ${res.status}`);
+    throw new HttpError(502, 'Could not get a valid response from the forecast service');
   }
 
   try {
     return await res.json();
   } catch (err) {
-    throw new HttpError(502, 'Bad Body');
+    //no body
+    throw new HttpError(502, 'Could not get a valid response from the forecast service');
   }
 }
 // TODO (you): look up a city with the geocoding API and return
