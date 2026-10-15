@@ -1,29 +1,40 @@
 import { HttpError } from '../lib/http-error.js';
 
-// TODO (you): check ?city= and return the trimmed city name. Throw a 400
-// HttpError with details.city when it breaks a rule from the assignment page.
+// Check ?city= and return the trimmed city name. Throws a 400
+// HttpError with details.city when it breaks the 2 to 60 characters rule.
 export function parseCity(req) {
   const city = req.query.city;
-  if (!city || typeof city !== 'string' || !city.trim()) {
-    throw new HttpError(400, 'Missing or invalid "city" query parameter');
+  if (!city || typeof city !== 'string' || city.trim().length < 2 || city.trim().length > 60) {
+    throw new HttpError(400, 'Invalid query', { city: 'city must be 2 to 60 characters' });
   }
   return city.trim();
 }
 
-// TODO (you): check ?cities= and return an array of trimmed city names. Throw a
-// 400 HttpError with details.cities when it breaks a rule from the assignment page.
-export function parseCities(value) {
+// Check ?cities= and return an array of trimmed city names. Throws a
+// 400 HttpError with details.cities when validation fails or duplicates exist.
+export function parseCities(req) {
   const citiesParam = req.query.cities;
   if (!citiesParam || typeof citiesParam !== 'string') {
-    throw new HttpError(400, 'Missing or invalid "cities" query parameter');
+    throw new HttpError(400, 'Invalid query', { cities: 'Missing or invalid "cities" query parameter' });
   }
-  const cities = citiesParam
+  
+  const rawCities = citiesParam
     .split(',')
     .map(c => c.trim())
     .filter(Boolean);
 
-  if (cities.length === 0) {
-    throw new HttpError(400, 'At least one city must be provided for comparison');
+  if (rawCities.length === 0) {
+    throw new HttpError(400, 'Invalid query', { cities: 'At least one city must be provided for comparison' });
   }
-  return cities;
+
+  const seen = new Set();
+  for (const c of rawCities) {
+    const lower = c.toLowerCase();
+    if (seen.has(lower)) {
+      throw new HttpError(400, 'Invalid query', { cities: `"${c}" is listed more than once` });
+    }
+    seen.add(lower);
+  }
+
+  return rawCities;
 }
