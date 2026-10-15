@@ -1,39 +1,62 @@
-import { config } from '../config.js';
 import { geocodeCity, getForecast } from './open-meteo.js';
 import { describeWeatherCode } from './weather-codes.js';
+import { getCache, setCache, getCacheStats } from './cache.js';
 
-// TODO (you): create one cache for the whole app, with a time to live of
-// config.cacheTtlSeconds.
-const cache = new Map();
-let hits = 0;
-let misses = 0;
-const CACHE_TTL_MS = config.cacheTtlSeconds * 1000;
-///function to delete old cache entried to prevent memory leak?
-//not sure if this is really necessary
-function purgeExpired() {
-  const now = Date.now();
-  for (const [key, entry] of cache.entries()) {
-    if (now > entry.expiresAt) {
-      cache.delete(key);
-    }
-  }
-}
+// Attribution text for the end of the output JSON
+const ATTRIBUTION_TEXT = "Weather data by Open-Meteo.com (https://open-meteo.com/)";
 
-// TODO (you): return the weather summary for one city, in the shape shown on
-// the assignment page. Check the cache first. On a miss, geocode the city, get
-// the forecast, build the summary, store it, and return it with cached: false.
-// On a hit, return the stored summary with cached: true.
+// Return the weather summary for one city, checking the cache first.
 export async function getCityWeather(city) {
-  throw new Error('getCityWeather is not written yet');
-}
+  const cacheKey = city.trim().toLowerCase();
+  
+  // Check cache first
+  const cachedSummary = getCache(cacheKey);
+  if (cachedSummary) {
+    return {
+      ...cachedSummary,
+      cached: true,
+    };
+  }
 
-// TODO (you): return the cache statistics for GET /api/cache/stats.
-export function getCacheStats() {
-  return {
-    entries: cache.size,
-    hits,
-    misses,
-    ttlSeconds: config.cacheTtlSeconds,
+  // On a miss: geocode city and get forecast
+  const location = await geocodeCity(city);
+  const forecastData = await getForecast(location.latitude, location.longitude);
+
+  // Build the weather summary
+  const summary = {
+    city: {
+      name: location.name,
+      region: location.region,
+      country: location.country,
+      latitude: location.latitude,
+      longitude: location.longitude,
+      timezone: location.timezone,
+    },
+    current: {
+      temperature: forecastData.current.temperature_2m,
+      apparentTemperature: forecastData.current.apparent_temperature,
+      humidity: forecastData.current.relative_humidity_2m,
+      windSpeed: forecastData.current.wind_speed_10m,
+      condition: describeWeatherCode(forecastData.current.weather_code),
+    },
+    forecast: forecastData.daily.time.map((date, index) => ({
+      date,
+      maxTemp: forecastData.daily.temperature_2m_max[index],
+      minTemp: forecastData.daily.temperature_2m_min[index],
+      precipitationProbability: forecastData.daily.precipitation_probability_max[index],
+      condition: describeWeatherCode(forecastData.daily.weather_code[index]),
+    })),
+    attribution: ATTRIBUTION_TEXT,
   };
 
+  // Store in cache
+  setCache(cacheKey, summary);
+
+  return {
+    ...summary,
+    cached: false,
+  };
 }
+
+// Re-export cache stats for route handlers
+export { getCacheStats };
