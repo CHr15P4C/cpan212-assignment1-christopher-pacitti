@@ -8,6 +8,17 @@ const cache = new Map();
 let hits = 0;
 let misses = 0;
 const CACHE_TTL_MS = config.cacheTtlSeconds * 1000;
+///function to delete old cache entried to prevent memory leak?
+//not sure if this is really necessary
+function purgeExpired() {
+  const now = Date.now();
+  for (const [key, entry] of cache.entries()) {
+    if (now > entry.expiresAt) {
+      cache.delete(key);
+    }
+  }
+}
+
 // TODO (you): return the weather summary for one city, in the shape shown on
 // the assignment page. Check the cache first. On a miss, geocode the city, get
 // the forecast, build the summary, store it, and return it with cached: false.
