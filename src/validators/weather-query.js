@@ -2,8 +2,12 @@ import { HttpError } from '../lib/http-error.js';
 
 // TODO (you): check ?city= and return the trimmed city name. Throw a 400
 // HttpError with details.city when it breaks a rule from the assignment page.
-export function parseCity(value) {
-  throw new Error('parseCity is not written yet');
+export function parseCity(req) {
+  const city = req.query.city;
+  if (!city || typeof city !== 'string' || !city.trim()) {
+    throw new HttpError(400, 'Missing or invalid "city" query parameter');
+  }
+  return city.trim();
 }
 
 // TODO (you): check ?cities= and return an array of trimmed city names. Throw a
