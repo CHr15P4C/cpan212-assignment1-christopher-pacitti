@@ -1,7 +1,8 @@
 # City Weather API
 
 TODO (you): one or two sentences on what this service does.
-So far, this app seems to get a lat long of a city using 1 api, then feed that into a second api that will get weather info.
+This service queries open meteo api, taking in city names, using geocoding api to get lat long of city, then open meteo for weather data of the target city or cities.
+The app handles a variety of errors, and keeps a universal cache so that rapid repeated queries don't overwhelm the server.
 ## Run it
 
 TODO (you): the commands to install and start it, including copying `.env.example` to `.env`.
