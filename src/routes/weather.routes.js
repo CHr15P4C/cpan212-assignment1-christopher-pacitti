@@ -7,12 +7,11 @@ export const weatherRouter = Router();
 // TODO (you): GET /api/weather?city=Toronto
 // Validate with parseCity, get the summary with getCityWeather, and respond
 // with { data, attribution }. Routes never call fetch themselves.
-weatherRouter.get('/weather', async (req, res) => {
+weatherRouter.get('/weather', async (req, res, next) => {
   try {
     const city = parseCity(req);
     const result = await getCityWeather(city);
     
-    // Respond with { data, attribution }
     res.json({
       data: result,
       attribution: "Weather data by Open-Meteo.com (https://open-meteo.com/)"
@@ -49,43 +48,23 @@ weatherRouter.get('/compare', async (req, res, next) => {
       if (settledResult.status === 'fulfilled') {
         succeeded++;
         const { weatherResult } = settledResult.value;
-        const currentTemp = weatherResult.current.temperature;
+        // Fix: use temperatureC instead of temperature
+        const currentTemp = weatherResult.current.temperatureC;
 
         // Track warmest and coldest based on current temperature
         if (currentTemp > maxTemp) {
           maxTemp = currentTemp;
-          warmestCity = weatherResult.city.name;
+          warmestCity = weatherResult.location.name;
         }
         if (currentTemp < minTemp) {
           minTemp = currentTemp;
-          coldestCity = weatherResult.city.name;
+          coldestCity = weatherResult.location.name;
         }
 
         return {
           city: originalName,
           ok: true,
-          weather: {
-            location: weatherResult.city,
-            current: {
-              time: weatherResult.current.time || new Date().toISOString().slice(0, 16),
-              temperatureC: weatherResult.current.temperature,
-              feelsLikeC: weatherResult.current.apparentTemperature,
-              humidityPercent: weatherResult.current.humidity,
-              windKmh: weatherResult.current.windSpeed,
-              weatherCode: weatherResult.current.weatherCode || 0,
-              conditions: weatherResult.current.condition,
-            },
-            daily: weatherResult.forecast.map(day => ({
-              date: day.date,
-              minC: day.minTemp,
-              maxC: day.maxTemp,
-              precipitationChancePercent: day.precipitationProbability,
-              weatherCode: day.weatherCode || 0,
-              conditions: day.condition,
-            })),
-            fetchedAt: new Date().toISOString(),
-            cached: weatherResult.cached,
-          }
+          weather: weatherResult
         };
       } else {
         failed++;
