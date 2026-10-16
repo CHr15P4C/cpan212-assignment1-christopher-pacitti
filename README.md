@@ -49,7 +49,7 @@ Returms tje output of combined get city weather of all cities input
 
 TODO (you): one `curl` command for each of the 10 requests on the assignment page, with the status
 code it should get on a freshly started server. On Windows, run these in Git Bash. An example to copy:
-
+THE assignment page says that the requests are in here but then this says that they are in the assignment page..... where are they? am i dumb?
 ```bash
 # Weather for a city: 200
 curl -i "http://localhost:4000/api/weather?city=Toronto"
