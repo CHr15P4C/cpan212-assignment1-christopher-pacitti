@@ -53,12 +53,31 @@ code it should get on a freshly started server. On Windows, run these in Git Bas
 ```bash
 # Weather for a city: 200
 curl -i "http://localhost:4000/api/weather?city=Toronto"
+# Weather for city that is cached: 200
+curl -i "http://localhost:4000/api/weather?city=Toronto"
+# Comparing 3 cities:200
+curl -i "http://localhost:4000/api/compare?cities=Vancouver,Halifax,Qwertyville"
+# Cache states after previous 3 requests before they expire: 200
+curl -i "http://localhost:4000/api/cache/stats"
+# invalit city character limit error 400:
+curl -i "http://localhost:4000/api/weather?city=T"
+#duplicated city in comparitor error 400:
+curl -i "http://localhost:4000/api/compare?cities=Toronto,Halifax,toronto"
+#nonexistant city (httperror with no results) 404:
+curl -i "http://localhost:4000/api/weather?city=Qwertyville"
+#setting env upstream timeout to 1ms, timeouterror 504:
+curl -i "http://localhost:4000/api/weather?city=Qwertyville"
+#with FORECAST_URL=https://weather.invalid/v1 - nonexistent host - 502 error - no valid response
+#norm: FORECAST_URL=https://api.open-meteo.com/v1
+curl -i "http://localhost:4000/api/weather?city=Toronto"
 ```
 
 ## Data source
 
 TODO (you): credit Open-Meteo with a link to https://open-meteo.com/.
-done in various places
+completed in:
+weatherRouter.get('/weather'
+
 
 ## AI use
 
