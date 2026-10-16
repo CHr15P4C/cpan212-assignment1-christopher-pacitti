@@ -36,7 +36,15 @@ How long a cached answer stays valid
 ## Endpoints
 
 TODO (you): each endpoint with an example request and a short description of the response.
+cacheRouter.get('/cache/stats'...
+return the cahce statistics: entries, hits, misses, and ttlSeconds
 
+weatherRouter.get('/weather'
+Returns the output of get city weather from a single city input
+
+weatherRouter.get('/compare'
+Returms tje output of combined get city weather of all cities input
+]
 ## Testing
 
 TODO (you): one `curl` command for each of the 10 requests on the assignment page, with the status
@@ -50,7 +58,10 @@ curl -i "http://localhost:4000/api/weather?city=Toronto"
 ## Data source
 
 TODO (you): credit Open-Meteo with a link to https://open-meteo.com/.
+done in various places
 
 ## AI use
 
 TODO (you): each AI tool you used and what for, or "No AI tools used."
+I asked gemeni for help on several sections of this assignment.
+I was especially stuck on the cache since WEEK 4 content was NOT AVAILABLE ON THE WEBSITE SO I HAD NO MATERIAL TO REFFERENCE. That being said, there was still documentation on expressjs.com

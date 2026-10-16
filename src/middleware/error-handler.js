@@ -8,7 +8,14 @@ export function errorHandler(err, req, res, next) {
 
   // TODO (you): when err is an HttpError, respond with err.status and
   // { error: { message: err.message, details: err.details } }.
-
+  // Handle HttpError instances with their specific status and payload structure
+  if (err instanceof HttpError) {
+    const errorPayload = { message: err.message };
+    if (err.details) {
+      errorPayload.details = err.details;
+    }
+    return res.status(err.status).json({ error: errorPayload });
+  }
   // Anything else is a bug. The details go to the terminal, never to the client.
   console.error(err);
   res.status(500).json({ error: { message: 'Internal server error' } });

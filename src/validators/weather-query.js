@@ -1,7 +1,6 @@
 import { HttpError } from '../lib/http-error.js';
 
-// Check ?city= and return the trimmed city name. Throws a 400
-// HttpError with details.city when it breaks the 2 to 60 characters rule.
+// Check ?city= and return the trimmed city name. Throws a 400 HttpError with details.city when it breaks the 2 to 60 characters rule.
 export function parseCity(req) {
   const city = req.query.city;
   if (!city || typeof city !== 'string' || city.trim().length < 2 || city.trim().length > 60) {
@@ -10,8 +9,7 @@ export function parseCity(req) {
   return city.trim();
 }
 
-// Check ?cities= and return an array of trimmed city names. Throws a
-// 400 HttpError with details.cities when validation fails or duplicates exist.
+// Check ?cities= and return an array of trimmed city names. Throws a 400 HttpError with details.cities when validation fails or duplicates exist.
 export function parseCities(req) {
   const citiesParam = req.query.cities;
   if (!citiesParam || typeof citiesParam !== 'string') {
