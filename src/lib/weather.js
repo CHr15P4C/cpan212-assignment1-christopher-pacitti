@@ -2,18 +2,20 @@ import { geocodeCity, getForecast } from './open-meteo.js';
 import { describeWeatherCode } from './weather-codes.js';
 import { getCache, setCache } from './cache.js';
 
-const ATTRIBUTION_TEXT = "Weather data by Open-Meteo.com (https://open-meteo.com/)";
-
 export async function getCityWeather(city) {
   const cacheKey = city.trim().toLowerCase();
   
+  // Check cache first
   const cachedEntry = getCache(cacheKey);
   if (cachedEntry) {
     return {
       ...cachedEntry,
-      cached: true,
+      cached: true, // cached responses report cached: true
     };
   }
+
+  // On a miss: capture fetchedAt at the exact time Open-Meteo is called
+  const fetchedAt = new Date().toISOString();
 
   const locationData = await geocodeCity(city);
   const forecastData = await getForecast(locationData.latitude, locationData.longitude);
@@ -40,18 +42,18 @@ export async function getCityWeather(city) {
       date,
       minC: forecastData.daily.temperature_2m_min[index],
       maxC: forecastData.daily.temperature_2m_max[index],
-      precipitationChancePercent: forecastData.daily.precipitation_probability_max[index],
+      precipitationChancePercent: forecastData.daily.precipitation_probability_max?.[index] ?? null,
       weatherCode: forecastData.daily.weather_code[index],
       conditions: describeWeatherCode(forecastData.daily.weather_code[index]),
     })),
-    fetchedAt: new Date().toISOString(),
+    fetchedAt,
   };
 
-  // Store in cache without the `cached` flag (cached is determined on read/return)
+  // Save the summary into the cache
   setCache(cacheKey, summary);
 
   return {
     ...summary,
-    cached: false,
+    cached: false, // fresh responses report cached: false
   };
 }
