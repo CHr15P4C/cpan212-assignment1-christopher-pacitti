@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { getCacheStats } from './weather.js';
+import { getCacheStats } from '../lib/cache.js';
 export const cacheRouter = Router();
 
 // TODO (you): respond with { data: <the cache statistics> }.
