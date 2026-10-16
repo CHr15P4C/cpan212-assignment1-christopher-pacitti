@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import { parseCity, parseCities } from '../validators/weather-query.js';
+import { getCityWeather } from '../lib/weather.js';
 
 export const weatherRouter = Router();
 
